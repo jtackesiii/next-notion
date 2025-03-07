@@ -1,0 +1,136 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary-clr:#2b2c72;
+  --secondary-clr: #eee;
+  --primary-font-family: prociono;
+  --primary-font-weight: 400;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+header, footer {
+    background-image: url("/header_bg_white.png");
+    padding-block: 1rem;
+    padding-inline: clamp(2rem, 5rem, 20vw);
+}
+
+.footer-img, .header-img {
+    max-height: 5rem;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    color: var(--primary-clr);
+}
+
+.nav-item {
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    text-decoration: underline;
+}
+
+.home-link {
+    color: red;
+}
+
+/* main */
+
+main {
+    max-width: max-content;
+    margin-inline: auto;
+    padding-block: 2rem;
+    padding-inline: clamp(2rem, 5rem, 20vw);
+}
+
+main p {
+    max-width: 80ch;
+}
+
+h1,h2,h3,h4,h5 {
+    color: var(--primary-clr);
+}
+
+.chunk {
+    border-top: solid 4px var(--primary-clr);
+    padding-bottom: 2rem;
+}
+
+.dropdown {
+  color: var(--primary-clr);
+  position: relative;
+  display: inline-block;
+min-width: 160px;
+  border-radius: 10px;
+  background-color: var(--secondary-clr);
+  border: 2px solid var(--primary-clr);
+  padding: 1em;
+}
+
+.dropdown-content {
+  display: none;
+  color: var(--primary-clr);
+  position: absolute;
+  background-color: var(--secondary-clr);
+  border: 2px solid var(--primary-clr);
+  border-top:none;
+  border-radius: 0 0 10px 10px;
+  min-width: 160px;
+  padding: 1em;
+  transform: translateX(calc(-1em - 2px));
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover {
+    border-bottom: none;
+}
+
+.search {
+    padding: 0.5em;
+    border: 2px solid var(--primary-clr);
+    font-size: 1.5rem;
+}
+
+.search-box {
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+}
+
+.search-button {
+    color: #eee;
+    background-color: var(--primary-clr);
+    border-radius: 0 5px 5px 0;
+}
