@@ -1,6 +1,6 @@
 "use server";
 
-import { Client } from "@notionhq/client";
+import { Client, isFullBlock, isFullPageOrDatabase } from "@notionhq/client";
 import { randomUUID } from "crypto";
 
 export type Multi = {
@@ -47,21 +47,26 @@ export const getProduction = async (): Promise<PostType[] | null> => {
         },
         ],
     });
-    const posts: PostType[] = response.results.map((result) => ({
-        id: result.id,
-        title: result.properties.Name.title[0].plain_text,
-        contributor: result.properties.Contributor?.multi_select.map((Contributor) => Contributor.name + ''),
-        updated: new Date(result.properties.Updated.last_edited_time).toLocaleDateString({month: "long", day: "numeric", year: "numeric"}),
-        description: result.properties.Description.rich_text[0].plain_text,
-        resourceType: result.properties.Resource.multi_select.map((Resource) => Resource.name + ''),
-        country: result.properties.Country?.multi_select?.map((Country) => Country.name + ''),
-        region: result.properties.Region?.formula?.string,
-        discipline: result.properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ''),
-        project: result.properties.Project?.select?.name,
-        audience: result.properties.Audience.multi_select?.map((Audience) => Audience.name + ''),
-        slug: result.properties.Slug.formula.string,
-    }));
-    console.log(response);
+
+    const posts: PostType[] = response.results
+      .filter(isFullPageOrDatabase)
+      .map((result) => {
+        const properties = result.properties as unknown as Properties;
+        return {
+          id: result.id,
+          title: properties.Name.title[0].plain_text,
+          contributor: properties.Contributor?.multi_select.map((Contributor) => Contributor.name + ''),
+          updated: new Date(properties.Updated.last_edited_time).toLocaleDateString({month: "long", day: "numeric", year: "numeric"}),
+          description: properties.Description.rich_text[0].plain_text,
+          resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ''),
+          country: properties.Country?.multi_select?.map((Country) => Country.name + ''),
+          region: properties.Region?.formula?.string,
+          discipline: properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ''),
+          project: properties.Project?.select?.name,
+          audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ''),
+          slug: properties.Slug.formula.string,
+        }
+    });
     return posts;
 }
 
@@ -74,19 +79,21 @@ export const getPageById = async (id: string): Promise<PostType[] | null> => {
         page_id: id,
     });
 
+    const properties = response.properties as unknown as Properties;
+
     return {
         id: response.id,
-        title: response.properties.Name.title[0].plain_text,
-        contributor: response.properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ' '),
-        updated: response.properties.Updated.last_edited_time,
-        description: response.properties.Description.rich_text[0].plain_text,
-        resourceType: response.properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
-        country: response.properties.Country?.multi_select?.map((Country) => Country.name + ' '),
-        region: response.properties.Region?.formula?.string,
-        discipline: response.properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ' '),
-        project: response.properties.Project?.select,
-        audience: response.properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
-        slug: response.properties.Slug.formula.string,
+        title: properties.Name.title[0].plain_text,
+        contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ' '),
+        updated: properties.Updated.last_edited_time,
+        description: properties.Description.rich_text[0].plain_text,
+        resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
+        country: properties.Country?.multi_select?.map((Country) => Country.name + ' '),
+        region: properties.Region?.formula?.string,
+        discipline: properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ' '),
+        project: properties.Project?.select,
+        audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
+        slug: properties.Slug.formula.string,
 
     }
 }
@@ -103,6 +110,10 @@ export const getBlocks = async (id: string) => {
     block_id: blockId,
     page_size: 100,
   });
+
+//   const isAllBlocks = results.every(isFullBlock);
+// if (!response || !isFullPageOrDatabase(response) || !results || !isAllBlocks)
+//   return null;
 
   // Fetches all child blocks recursively
   // be mindful of rate limits if you have large amounts of nested blocks
