@@ -15,23 +15,59 @@ export function renderBlock(block) {
         </p>
       );
     case 'heading_1':
-      return (
-        <h1>
-          <Text title={value.rich_text} />
-        </h1>
-      );
+      if (value.is_toggleable) {
+        return (
+          <details>
+            <summary className="header-1">
+              <Text title={value.rich_text} />
+            </summary>
+            {block.children?.map((child) => (
+              <Fragment key={child.id}>{renderBlock(child)}</Fragment>
+            ))}
+          </details>
+        )
+      } else {
+        return (
+          <h1>
+            <Text title={value.rich_text} />
+          </h1>
+      )};
     case 'heading_2':
-      return (
-        <h2>
-          <Text title={value.rich_text} />
-        </h2>
-      );
+      if (value.is_toggleable) {
+        return (
+          <details>
+            <summary className="header-2">
+              <Text title={value.rich_text} />
+            </summary>
+            {block.children?.map((child) => (
+              <Fragment key={child.id}>{renderBlock(child)}</Fragment>
+            ))}
+          </details>
+        )
+      } else {
+        return (
+          <h2>
+            <Text title={value.rich_text} />
+          </h2>
+      )};
     case 'heading_3':
-      return (
-        <h3>
-          <Text title={value.rich_text} />
-        </h3>
-      );
+      if (value.is_toggleable) {
+        return (
+          <details>
+            <summary className="header-3">
+              <Text title={value.rich_text} />
+            </summary>
+            {block.children?.map((child) => (
+              <Fragment key={child.id}>{renderBlock(child)}</Fragment>
+            ))}
+          </details>
+        )
+      } else {
+        return (
+          <h3>
+            <Text title={value.rich_text} />
+          </h3>
+      )};
     case 'bulleted_list': {
       return <ul>{value.children.map((child) => renderBlock(child))}</ul>;
     }
@@ -154,6 +190,12 @@ export function renderBlock(block) {
     case 'column': {
       return <div>{block.children.map((child) => renderBlock(child))}</div>;
     }
+    case 'video': {
+      const src = value.external.url
+      console.log(src);
+      return <iframe width="640" height="360" src={src}></iframe>
+    }
+
     default:
       return `❌ Unsupported block (${
         type === 'unsupported' ? 'unsupported by Notion API' : type

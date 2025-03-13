@@ -25,12 +25,13 @@ export default function RootLayout({
         </header>
         <main>{children}</main>
         <footer>
-          <img className="footer-img" src="/logo.png" alt="ASIANetwork logo" />
-          <div className="footer-nav flex">
+          <div className="flex">
+            <img className="header-img" src="/logo.png" alt="ASIANetwork logo" />
             <Link className="nav-item home-link" href="/"><b>Home</b></Link>
+            <Link className="nav-item" href="/About">About</Link>
             <p>Contact Us</p>
           </div>
-          <p>&copy; {new Date().getFullYear()} ASIANetwork</p>
+          <p className="copyright">&copy; {new Date().getFullYear()} ASIANetwork</p>
           </footer>
         </body>
     </html>

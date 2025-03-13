@@ -10,13 +10,12 @@ export default async function PostPage ({
     const postId = (await params).id;
     const post = await getPageById(postId);
     const blocks = await getBlocks(postId);
-console.log(postId);
-    return <div>
+console.log(blocks);
+    return <div className="main">
         <h2>{post?.title}</h2>
         <p>{post?.description}</p>
         {blocks?.map((block) => (
             <Fragment key={block.id}>{renderBlock(block)}</Fragment>
           ))}
-
     </div>
 };
