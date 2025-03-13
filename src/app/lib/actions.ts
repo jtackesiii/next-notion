@@ -3,10 +3,15 @@
 import { Client } from "@notionhq/client";
 import { randomUUID } from "crypto";
 
+export type Multi = {
+  name: string;
+  color: string;
+}
+
 export interface PostType {
     id: string;
     title: string;
-    contributor?: string;
+    contributor?: string[];
     updated: string;
     description: string;
     resourceType: string[];
@@ -14,7 +19,7 @@ export interface PostType {
     region?: string;
     discipline?: string[];
     project?: string;
-    audience: string[];
+    audience?: string[];
     slug: string;
 }
 
@@ -42,22 +47,21 @@ export const getProduction = async (): Promise<PostType[] | null> => {
         },
         ],
     });
-
     const posts: PostType[] = response.results.map((result) => ({
         id: result.id,
         title: result.properties.Name.title[0].plain_text,
-        contributor: result.properties.Contributor?.select,
-        updated: result.properties.Updated.last_edited_time,
+        contributor: result.properties.Contributor?.multi_select.map((Contributor) => Contributor.name + ''),
+        updated: new Date(result.properties.Updated.last_edited_time).toLocaleDateString({month: "long", day: "numeric", year: "numeric"}),
         description: result.properties.Description.rich_text[0].plain_text,
-        resourceType: result.properties.Resource.multi_select.map((Resource) => Resource.name),
-        country: result.properties.Country?.multi_select?.map((Country) => Country.name),
+        resourceType: result.properties.Resource.multi_select.map((Resource) => Resource.name + ''),
+        country: result.properties.Country?.multi_select?.map((Country) => Country.name + ''),
         region: result.properties.Region?.formula?.string,
-        discipline: result.properties.Discipline?.select,
-        project: result.properties.Project?.select,
-        audience: result.properties.Audience.multi_select?.map((Audience) => Audience.name),
+        discipline: result.properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ''),
+        project: result.properties.Project?.select?.name,
+        audience: result.properties.Audience.multi_select?.map((Audience) => Audience.name + ''),
         slug: result.properties.Slug.formula.string,
     }));
-
+    console.log(response);
     return posts;
 }
 
@@ -73,16 +77,17 @@ export const getPageById = async (id: string): Promise<PostType[] | null> => {
     return {
         id: response.id,
         title: response.properties.Name.title[0].plain_text,
-        contributor: response.properties.Contributor?.multi_select?.map((Contributor) => Contributor.name),
+        contributor: response.properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ' '),
         updated: response.properties.Updated.last_edited_time,
         description: response.properties.Description.rich_text[0].plain_text,
-        resourceType: response.properties.Resource.multi_select.map((Resource) => Resource.name),
-        country: response.properties.Country?.multi_select?.map((Country) => Country.name),
+        resourceType: response.properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
+        country: response.properties.Country?.multi_select?.map((Country) => Country.name + ' '),
         region: response.properties.Region?.formula?.string,
-        discipline: response.properties.Discipline?.select,
+        discipline: response.properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ' '),
         project: response.properties.Project?.select,
-        audience: response.properties.Audience.multi_select?.map((Audience) => Audience.name),
+        audience: response.properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
         slug: response.properties.Slug.formula.string,
+
     }
 }
 

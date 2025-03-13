@@ -29,7 +29,7 @@ export default function Text({ title }) {
       </span>
     )} else {
       return (
-        <Link key={value.mention.page.id} href={`/pages/${value.mention.page.id}`}>{value.plain_text}</Link>
+        <Link key={value.mention.page.id} href={`/resources/${value.mention.page.id}`}>{value.plain_text}</Link>
       )};
   });
 }
