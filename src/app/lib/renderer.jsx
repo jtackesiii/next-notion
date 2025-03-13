@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import Text from './text';
 import styles from '@/app/post.module.css';
+import { randomUUID } from 'crypto';
 
 export function renderBlock(block) {
   const { type, id } = block;
@@ -9,11 +10,12 @@ export function renderBlock(block) {
 
   switch (type) {
     case 'paragraph':
-      return (
-        <p>
-          <Text title={value.rich_text} />
-        </p>
-      );
+      // console.log(block);
+        return (
+          <p key={randomUUID()}>
+            <Text title={value.rich_text} />
+          </p>
+        );
     case 'heading_1':
       if (value.is_toggleable) {
         return (
@@ -46,7 +48,7 @@ export function renderBlock(block) {
         )
       } else {
         return (
-          <h2>
+          <h2 key={randomUUID()}>
             <Text title={value.rich_text} />
           </h2>
       )};
@@ -188,7 +190,7 @@ export function renderBlock(block) {
       );
     }
     case 'column': {
-      return <div>{block.children.map((child) => renderBlock(child))}</div>;
+      return <div key={randomUUID()}>{block.children.map((child) => renderBlock(child))}</div>;
     }
     case 'video': {
       const src = value.external.url
@@ -197,6 +199,7 @@ export function renderBlock(block) {
     }
 
     default:
+      console.log(block);
       return `❌ Unsupported block (${
         type === 'unsupported' ? 'unsupported by Notion API' : type
       })`;

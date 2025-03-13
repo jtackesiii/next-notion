@@ -112,10 +112,15 @@
 
 .row {
   display: flex;
+  gap: 1rem;
 }
 
 .row > div {
   flex: 1;
+}
+
+.row * {
+  padding-block: 0.5rem;
 }
 
 .childPage {

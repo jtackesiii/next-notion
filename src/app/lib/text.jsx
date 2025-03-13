@@ -1,4 +1,5 @@
 import styles from '@/app/post.module.css';
+import Link from 'next/link';
 
 export default function Text({ title }) {
   if (!title) {
@@ -11,6 +12,7 @@ export default function Text({ title }) {
       },
       text,
     } = value;
+    if (value.type === 'text') {
     return (
       <span
         className={[
@@ -25,6 +27,9 @@ export default function Text({ title }) {
       >
         {text.link ? <a href={text.link.url}>{text.content}</a> : text.content}
       </span>
-    );
+    )} else {
+      return (
+        <Link key={value.mention.page.id} href={`/pages/${value.mention.page.id}`}>{value.plain_text}</Link>
+      )};
   });
 }

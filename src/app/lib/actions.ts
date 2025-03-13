@@ -15,6 +15,7 @@ export interface PostType {
     discipline?: string[];
     project?: string;
     audience: string[];
+    slug: string;
 }
 
 const notion = new Client({
@@ -54,6 +55,7 @@ export const getProduction = async (): Promise<PostType[] | null> => {
         discipline: result.properties.Discipline?.select,
         project: result.properties.Project?.select,
         audience: result.properties.Audience.multi_select?.map((Audience) => Audience.name),
+        slug: result.properties.Slug.formula.string,
     }));
 
     return posts;
@@ -80,6 +82,7 @@ export const getPageById = async (id: string): Promise<PostType[] | null> => {
         discipline: response.properties.Discipline?.select,
         project: response.properties.Project?.select,
         audience: response.properties.Audience.multi_select?.map((Audience) => Audience.name),
+        slug: response.properties.Slug.formula.string,
     }
 }
 

@@ -116,6 +116,14 @@ details:open > * {
   padding-block: 0.5rem;
 }
 
+ul, ol {
+  padding-left: 2rem;
+}
+
+li {
+  padding-block: 0.25rem;
+}
+
 /* wizard stuff */
 
 .chunk {
