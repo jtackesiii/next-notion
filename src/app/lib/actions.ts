@@ -1,6 +1,6 @@
 "use server";
 
-import { Client, isFullBlock, isFullPageOrDatabase } from "@notionhq/client";
+import { Client, isFullPageOrDatabase } from "@notionhq/client";
 import { randomUUID } from "crypto";
 
 export type Multi = {
@@ -110,10 +110,6 @@ export const getBlocks = async (id: string) => {
     block_id: blockId,
     page_size: 100,
   });
-
-//   const isAllBlocks = results.every(isFullBlock);
-// if (!response || !isFullPageOrDatabase(response) || !results || !isAllBlocks)
-//   return null;
 
   // Fetches all child blocks recursively
   // be mindful of rate limits if you have large amounts of nested blocks
