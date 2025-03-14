@@ -28,8 +28,7 @@ const notion = new Client({
 });
 
 export const getProduction = async (): Promise<PostType[] | null> => {
-    const databaseId = process.env.NOTION_PRODUCTION_DB;
-
+    const databaseId = Netlify.env.get("NOTION_PRODUCTION_DB");
     if(!databaseId) return console.log('Invalid Database ID');
 
     const response = await notion.databases.query({
