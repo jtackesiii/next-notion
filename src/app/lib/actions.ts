@@ -2,37 +2,20 @@
 
 import { Client, isFullPageOrDatabase } from "@notionhq/client";
 import { randomUUID } from "crypto";
-
-export type Multi = {
-  name: string;
-  color: string;
-}
-
-export interface PostType {
-    id: string;
-    title: string;
-    contributor?: string[];
-    updated: string;
-    description: string;
-    resourceType: string[];
-    country?: string[];
-    region?: string;
-    discipline?: string[];
-    project?: string;
-    audience?: string[];
-    slug: string;
-}
+import { PostType, Properties } from "@/types/types.notion";
 
 const notion = new Client({
     auth: process.env.NOTION_SECRET,
 });
 
+const databaseId = process.env.NOTION_PRODUCTION_DB;
+
+
 export const getProduction = async (): Promise<PostType[] | null> => {
-    const databaseId = process.env.NOTION_PRODUCTION_DB;
-    if(!databaseId) return console.log('Invalid Database ID');
+    if(!databaseId) return null;
 
     const response = await notion.databases.query({
-        database_id: databaseId,
+        database_id: databaseId!,
         filter: {
             property: "Status",
             status: {
@@ -47,15 +30,18 @@ export const getProduction = async (): Promise<PostType[] | null> => {
         ],
     });
 
+    if (!response || !response?.results.length) return null;
+
     const posts: PostType[] = response.results
       .filter(isFullPageOrDatabase)
       .map((result) => {
         const properties = result.properties as unknown as Properties;
+        const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
         return {
           id: result.id,
           title: properties.Name.title[0].plain_text,
           contributor: properties.Contributor?.multi_select.map((Contributor) => Contributor.name + ''),
-          updated: new Date(properties.Updated.last_edited_time).toLocaleDateString({month: "long", day: "numeric", year: "numeric"}),
+          updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
           description: properties.Description.rich_text[0].plain_text,
           resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ''),
           country: properties.Country?.multi_select?.map((Country) => Country.name + ''),
@@ -70,21 +56,23 @@ export const getProduction = async (): Promise<PostType[] | null> => {
 }
 
 export const getPageById = async (id: string): Promise<PostType[] | null> => {
-    const databaseId = process.env.NOTION_PRODUCTION_DB;
 
-    if(!databaseId || !id) return console.log('Invalid Database or Page ID');
+    if(!databaseId || !id) return null;
 
     const response = await notion.pages.retrieve({
         page_id: id,
     });
 
+    if (!response || !isFullPageOrDatabase(response)) return null;
+
     const properties = response.properties as unknown as Properties;
+    const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
 
     return {
         id: response.id,
         title: properties.Name.title[0].plain_text,
         contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ' '),
-        updated: properties.Updated.last_edited_time,
+        updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
         description: properties.Description.rich_text[0].plain_text,
         resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
         country: properties.Country?.multi_select?.map((Country) => Country.name + ' '),
@@ -93,7 +81,6 @@ export const getPageById = async (id: string): Promise<PostType[] | null> => {
         project: properties.Project?.select,
         audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
         slug: properties.Slug.formula.string,
-
     }
 }
 

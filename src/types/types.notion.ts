@@ -1,4 +1,24 @@
-interface Properties {
+export type Multi = {
+  name: string;
+  color: string;
+}
+
+export interface PostType {
+    id: string;
+    title: string;
+    contributor?: string[];
+    updated: string;
+    description: string;
+    resourceType: string[];
+    country?: string[];
+    region?: string;
+    discipline?: string[];
+    project?: string;
+    audience?: string[];
+    slug: string;
+}
+
+export interface Properties {
   Slug: Slug;
   Audience: Audience;
   Region: Region;
@@ -38,6 +58,34 @@ interface Updated {
 }
 
 interface Discipline {
+  id: string;
+  type: string;
+  multi_select: Multiselect[];
+}
+
+interface Region {
+  id: string;
+  type: string;
+  formula: Formula;
+}
+
+interface Formula {
+  string: string;
+}
+
+interface Resource {
+  id: string;
+  type: string;
+  multi_select: Multiselect[];
+}
+
+interface Contributor {
+  id: string;
+  type: string;
+  multi_select: Multiselect[];
+}
+
+interface Country {
   id: string;
   type: string;
   multi_select: Multiselect[];
