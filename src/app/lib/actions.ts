@@ -39,13 +39,13 @@ export const getProduction = async (): Promise<PostType[] | null> => {
         return {
           id: result.id,
           title: properties.Name.title[0].plain_text,
-          contributor: properties.Contributor?.multi_select.map((Contributor) => Contributor.name + ''),
+          contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ''),
           updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
           description: properties.Description.rich_text[0].plain_text,
           resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ''),
           country: properties.Country?.multi_select?.map((Country) => Country.name + ''),
           region: properties.Region?.formula?.string,
-          discipline: properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ''),
+          discipline: properties.Discipline?.multi_select?.map((Discipline) => Discipline.name + ''),
           project: properties.Project?.select?.name,
           audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ''),
           slug: properties.Slug.formula.string,
@@ -66,7 +66,6 @@ export const getPageById = async (id: string): Promise<PostType | null> => {
 
     const properties = response.properties as unknown as Properties;
     const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
-
     return {
         id: response.id,
         title: properties.Name.title[0].plain_text,
@@ -76,8 +75,8 @@ export const getPageById = async (id: string): Promise<PostType | null> => {
         resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
         country: properties.Country?.multi_select?.map((Country) => Country.name + ' '),
         region: properties.Region?.formula?.string,
-        discipline: properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ' '),
-        project: properties.Project?.select.name,
+        discipline: properties.Discipline?.multi_select?.map((Discipline) => Discipline.name + ' '),
+        project: properties.Project?.select?.name,
         audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
         slug: properties.Slug.formula.string,
     }
