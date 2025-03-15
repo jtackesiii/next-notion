@@ -15,7 +15,7 @@ export default async function PostPage ({
     return (<div className="main">
         <h2>{post?.title}</h2>
         <p>{post?.description}</p>
-        {blocks?.map((block) => (
+        {blocks?.map((block: any) => (
             <Fragment key={block.id}>{renderBlock(block)}</Fragment>
           ))}
     </div>

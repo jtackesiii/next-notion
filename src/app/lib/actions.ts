@@ -1,6 +1,6 @@
 "use server";
 
-import { Client, isFullPageOrDatabase } from "@notionhq/client";
+import { Client, isFullBlock, isFullPageOrDatabase } from "@notionhq/client";
 import { randomUUID } from "crypto";
 import { PostType, Properties } from "@/types/types.notion";
 
@@ -9,7 +9,6 @@ const notion = new Client({
 });
 
 const databaseId = process.env.NOTION_PRODUCTION_DB;
-
 
 export const getProduction = async (): Promise<PostType[] | null> => {
     if(!databaseId) return null;
@@ -55,7 +54,7 @@ export const getProduction = async (): Promise<PostType[] | null> => {
     return posts;
 }
 
-export const getPageById = async (id: string): Promise<PostType[] | null> => {
+export const getPageById = async (id: string): Promise<PostType | null> => {
 
     if(!databaseId || !id) return null;
 
@@ -78,7 +77,7 @@ export const getPageById = async (id: string): Promise<PostType[] | null> => {
         country: properties.Country?.multi_select?.map((Country) => Country.name + ' '),
         region: properties.Region?.formula?.string,
         discipline: properties.Discipline?.multi_select.map((Discipline) => Discipline.name + ' '),
-        project: properties.Project?.select,
+        project: properties.Project?.select.name,
         audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
         slug: properties.Slug.formula.string,
     }
@@ -96,11 +95,14 @@ export const getBlocks = async (id: string) => {
     block_id: blockId,
     page_size: 100,
   });
+  const isAllBlocks = results.every(isFullBlock);
+  if (!results || !isAllBlocks)
+    return null;
 
   // Fetches all child blocks recursively
   // be mindful of rate limits if you have large amounts of nested blocks
   // See https://developers.notion.com/docs/working-with-page-content#reading-nested-blocks
-  const childBlocks = results.map(async (block) => {
+  const childBlocks: any = results.map(async (block) => {
     if (block.has_children) {
       const children = await getBlocks(block.id);
       return { ...block, children };
