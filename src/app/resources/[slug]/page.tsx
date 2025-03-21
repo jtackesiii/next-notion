@@ -4,10 +4,10 @@ import { renderBlock } from "@/app/lib/renderer";
 
 export async function generateStaticParams() {
   const database = await getProduction();
-  return database?.map((page) => {
-    const slug = page.slug;
-    return ({ slug });
-  });
+
+  return database!.map((post) => ({
+    slug: post.slug,
+  }))
 }
 
 export default async function PostPage ({
@@ -15,8 +15,7 @@ export default async function PostPage ({
 }: {
     params: Promise<{slug: string}>;
 }) {
-    // const postId = (await params).id;
-    const slug = (await params).slug;
+    const { slug } = await params;
     const post = await getPageBySlug(slug);
     const blockId = post![0].id;
     const blocks = await getBlocks(blockId);
