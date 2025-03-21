@@ -1,5 +1,6 @@
 import styles from '@/app/post.module.css';
 import Link from 'next/link';
+import { getPageById } from './actions';
 
 export default function Text({ title }) {
   if (!title) {
@@ -28,8 +29,11 @@ export default function Text({ title }) {
         {text.link ? <a href={text.link.url}>{text.content}</a> : text.content}
       </span>
     )} else {
+      const base = value.plain_text;
+      const target = base.toLowerCase().replaceAll(" ", "-");
       return (
-        <Link key={value.mention.page.id} href={`/resources/${value.mention.page.id}`}>{value.plain_text}</Link>
+        //Currently mimics slug from mention title, rather than deriving slug from mention ID
+        <Link key={value.mention.page.id} href={`/resources/${target}`}>{value.plain_text}</Link>
       )};
   });
 }

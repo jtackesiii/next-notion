@@ -8,7 +8,7 @@ export default async function Home() {
       <h1>ASIANetwork Digital Resources</h1>
       {posts?.map((post) => (
         <div key={post.id}>
-          <Link href={`/resources/${post.id}`}>
+          <Link href={`/resources/${post.slug}`}>
             <h2>{post.title}</h2>
           </Link>
         <p>{post.description}</p>

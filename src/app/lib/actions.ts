@@ -82,6 +82,46 @@ export const getPageById = async (id: string): Promise<PostType | null> => {
     }
 }
 
+export const getPageBySlug = async (slug: string): Promise<PostType[] | null> => {
+    if(!databaseId) return null;
+
+    const response = await notion.databases.query({
+        database_id: databaseId!,
+        filter: {
+          property: 'Slug',
+          formula: {
+            string: {
+              equals: slug,
+            },
+          },
+        },
+    });
+
+    if (!response || !response?.results.length) return null;
+
+    const post = response.results
+      .filter(isFullPageOrDatabase)
+      .map((result) => {
+        const properties = result.properties as unknown as Properties;
+        const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
+        return {
+          id: result.id,
+          title: properties.Name.title[0].plain_text,
+          contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ''),
+          updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
+          description: properties.Description.rich_text[0].plain_text,
+          resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ''),
+          country: properties.Country?.multi_select?.map((Country) => Country.name + ''),
+          region: properties.Region?.formula?.string,
+          discipline: properties.Discipline?.multi_select?.map((Discipline) => Discipline.name + ''),
+          project: properties.Project?.select?.name,
+          audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ''),
+          slug: properties.Slug.formula.string,
+        }
+    });
+    return post as unknown as PostType[];
+}
+
 export const getBlocks = async (id: string) => {
 
     const databaseId = process.env.NOTION_PRODUCTION_DB;
