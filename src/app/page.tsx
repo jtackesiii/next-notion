@@ -1,19 +1,21 @@
-import Link from "next/link";
 import { getProduction } from "@/app/lib/actions";
+import { Heading } from "@chakra-ui/react";
+import DataTable from "@/app/lib/DataTable";
 
 export default async function Home() {
   const posts = await getProduction();
   return (
     <div className="main">
-      <h1>ASIANetwork Digital Resources</h1>
-      {posts?.map((post) => (
+      <Heading size="3xl">ASIANetwork Digital Resources</Heading>
+      <DataTable data={posts} />
+      {/* {posts?.map((post) => (
         <div key={post.id}>
           <Link href={`/resources/${post.slug}`}>
-            <h2>{post.title}</h2>
+            <Heading size="2xl">{post.title}</Heading>
           </Link>
         <p>{post.description}</p>
         </div>
-       ))}
+       ))} */}
     </div>
   );
 }

@@ -42,13 +42,14 @@ export const getProduction = async (): Promise<PostType[] | null> => {
           contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ''),
           updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
           description: properties.Description.rich_text[0].plain_text,
-          resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ''),
+          resourceType: properties.Resource.multi_select,
           country: properties.Country?.multi_select?.map((Country) => Country.name + ''),
           region: properties.Region?.formula?.string,
-          discipline: properties.Discipline?.multi_select?.map((Discipline) => Discipline.name + ''),
+          discipline: properties.Discipline?.multi_select,
           project: properties.Project?.select?.name,
-          audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ''),
+          audience: properties.Audience?.multi_select,
           slug: properties.Slug.formula.string,
+          url: properties.URL.url
         }
     });
     return posts;

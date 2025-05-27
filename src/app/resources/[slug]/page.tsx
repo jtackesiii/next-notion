@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { getBlocks, getProduction, getPageBySlug } from "@/app/lib/actions";
 import { renderBlock } from "@/app/lib/renderer";
+import { Heading } from '@chakra-ui/react';
 
 export async function generateStaticParams() {
   const database = await getProduction();
@@ -20,8 +21,8 @@ export default async function PostPage ({
     const blockId = post![0].id;
     const blocks = await getBlocks(blockId);
 
-    return (<div className="main">
-        <h2>{post![0].title}</h2>
+    return (<div className="main" id={slug}>
+        <Heading size="3xl">{post![0].title}</Heading>
         <p>{post![0].description}</p>
         {blocks?.map((block: any) => (
             <Fragment key={block.id}>{renderBlock(block)}</Fragment>

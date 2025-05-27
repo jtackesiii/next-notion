@@ -1,5 +1,7 @@
+import { Provider } from "@/components/ui/provider";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Image } from "@chakra-ui/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,26 +15,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
+        <Provider>
         <header>
           <nav className="flex">
-            <Link href="https://asianetwork.org"><img className="header-img" src="/logo.png" alt="ASIANetwork logo" /></Link>
+            <Link href="https://asianetwork.org"><Image className="header-img" src="/logo.png" alt="ASIANetwork logo" /></Link>
             <Link className="nav-item home-link" href="/"><b>Home</b></Link>
-            <Link className="nav-item" href="/About">About</Link>
+            <Link className="nav-item" href="/resources/about">About</Link>
             <p>Contact Us</p>
           </nav>
         </header>
-        <main>{children}</main>
+        <main>
+            {children}
+          </main>
         <footer>
           <div className="flex">
-            <img className="header-img" src="/logo.png" alt="ASIANetwork logo" />
+            <Image className="header-img" src="/logo.png" alt="ASIANetwork logo" />
             <Link className="nav-item home-link" href="/"><b>Home</b></Link>
-            <Link className="nav-item" href="/About">About</Link>
+            <Link className="nav-item" href="/resources/about">About</Link>
             <p>Contact Us</p>
           </div>
           <p className="copyright">&copy; {new Date().getFullYear()} ASIANetwork</p>
           </footer>
+          </Provider>
         </body>
     </html>
   );

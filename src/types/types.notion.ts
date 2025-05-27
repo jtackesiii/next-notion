@@ -9,13 +9,14 @@ export interface PostType {
     contributor?: string[];
     updated: string;
     description: string;
-    resourceType: string[];
+    resourceType: any;
     country?: string[];
     region?: string;
-    discipline?: string[];
+    discipline?: any;
     project?: string;
-    audience?: string[];
+    audience?: any;
     slug: string;
+    url: string;
 }
 
 export interface Properties {
@@ -31,12 +32,19 @@ export interface Properties {
   Project: Project;
   Country: Country;
   Name: Name;
+  URL: URL;
 }
 
 interface Name {
   id: string;
   type: string;
   title: Richtext[];
+}
+
+interface URL {
+  id: string;
+  type: string;
+  url: string;
 }
 
 interface Project {

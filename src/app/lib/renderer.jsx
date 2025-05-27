@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Text from './text';
 import styles from '@/app/post.module.css';
 import { randomUUID } from 'crypto';
+import { Heading, Image, AspectRatio, List, Accordion } from '@chakra-ui/react';
 
 export function renderBlock(block) {
   const { type, id } = block;
@@ -10,7 +11,6 @@ export function renderBlock(block) {
 
   switch (type) {
     case 'paragraph':
-      // console.log(block);
         return (
           <p key={randomUUID()}>
             <Text title={value.rich_text} />
@@ -30,9 +30,9 @@ export function renderBlock(block) {
         )
       } else {
         return (
-          <h1>
+          <Heading size="3xl">
             <Text title={value.rich_text} />
-          </h1>
+          </Heading>
       )};
     case 'heading_2':
       if (value.is_toggleable) {
@@ -48,9 +48,9 @@ export function renderBlock(block) {
         )
       } else {
         return (
-          <h2 key={randomUUID()}>
+          <Heading size="2xl" key={randomUUID()}>
             <Text title={value.rich_text} />
-          </h2>
+          </Heading>
       )};
     case 'heading_3':
       if (value.is_toggleable) {
@@ -66,24 +66,24 @@ export function renderBlock(block) {
         )
       } else {
         return (
-          <h3>
+          <Heading size="xl">
             <Text title={value.rich_text} />
-          </h3>
+          </Heading>
       )};
     case 'bulleted_list': {
-      return <ul>{value.children.map((child) => renderBlock(child))}</ul>;
+      return <List.Root>{value.children.map((child) => renderBlock(child))}</List.Root>;
     }
     case 'numbered_list': {
-      return <ol>{value.children.map((child) => renderBlock(child))}</ol>;
+      return <List.Root as="ol">{value.children.map((child) => renderBlock(child))}</List.Root>;
     }
     case 'bulleted_list_item':
     case 'numbered_list_item':
       return (
-        <li key={block.id}>
+        <List.Item _marker={{color: "navy"}} key={block.id}>
           <Text title={value.rich_text} />
           {/* eslint-disable-next-line no-use-before-define */}
           {!!value.children && renderNestedList(block)}
-        </li>
+        </List.Item>
       );
     case 'to_do':
       return (
@@ -117,8 +117,8 @@ export function renderBlock(block) {
       const src = value.type === 'external' ? value.external.url : value.file.url;
       const caption = value.caption ? value.caption[0]?.plain_text : '';
       return (
-        <figure>
-          <img src={src} alt={caption} />
+        <figure key={id}>
+          <Image src={src} alt={caption} className="img-responsive" />
           {caption && <figcaption>{caption}</figcaption>}
         </figure>
       );
@@ -184,7 +184,7 @@ export function renderBlock(block) {
     }
     case 'column_list': {
       return (
-        <div className={styles.row}>
+        <div className={`min-column ${styles.row}`}>
           {block.children.map((childBlock) => renderBlock(childBlock))}
         </div>
       );
@@ -194,12 +194,14 @@ export function renderBlock(block) {
     }
     case 'video': {
       const src = value.external.url
-      console.log(src);
-      return <iframe width="640" height="360" src={src}></iframe>
+      return (
+        <AspectRatio>
+          <iframe src={src} allowFullScreen></iframe>
+        </AspectRatio>
+      )
     }
 
     default:
-      console.log(block);
       return `❌ Unsupported block (${
         type === 'unsupported' ? 'unsupported by Notion API' : type
       })`;
