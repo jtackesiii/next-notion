@@ -140,9 +140,7 @@ export const getBlocks = async (id: string) => {
   if (!results || !isAllBlocks)
     return null;
 
-  // Fetches all child blocks recursively
-  // be mindful of rate limits if you have large amounts of nested blocks
-  // See https://developers.notion.com/docs/working-with-page-content#reading-nested-blocks
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const childBlocks: any = results.map(async (block) => {
     if (block.has_children) {
       const children = await getBlocks(block.id);
