@@ -80,6 +80,7 @@ export const getPageById = async (id: string): Promise<PostType | null> => {
         project: properties.Project?.select?.name,
         audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
         slug: properties.Slug.formula.string,
+        url: properties.URL.url
     }
 }
 
