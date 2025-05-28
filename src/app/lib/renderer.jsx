@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Text from './text';
 import styles from '@/app/post.module.css';
 import { randomUUID } from 'crypto';
-import { Heading, Image, AspectRatio, List, Accordion } from '@chakra-ui/react';
+import { Heading, Image, AspectRatio, List, Stack } from '@chakra-ui/react';
 
 export function renderBlock(block) {
   const { type, id } = block;
@@ -184,9 +184,9 @@ export function renderBlock(block) {
     }
     case 'column_list': {
       return (
-        <div className={`min-column ${styles.row}`}>
+        <Stack direction={{ base: "column", md: "row" }} gap="10">
           {block.children.map((childBlock) => renderBlock(childBlock))}
-        </div>
+        </Stack>
       );
     }
     case 'column': {

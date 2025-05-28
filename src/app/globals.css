@@ -90,6 +90,15 @@ h1,h2,h3,h4,h5 {
     color: var(--primary-clr);
 }
 
+a {
+    color: var(--primary-clr);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 .header-1 {
     color: var(--primary-clr);
     font-size: 2rem;
@@ -122,63 +131,6 @@ li {
   padding-block: 0.25rem;
 }
 
-/* wizard stuff */
-
-.chunk {
-    border-top: solid 4px var(--primary-clr);
-    padding-bottom: 2rem;
-}
-
-.dropdown {
-  color: var(--primary-clr);
-  position: relative;
-  display: inline-block;
-min-width: 160px;
-  border-radius: 10px;
-  background-color: var(--secondary-clr);
-  border: 2px solid var(--primary-clr);
-  padding: 1em;
-}
-
-.dropdown-content {
-  display: none;
-  color: var(--primary-clr);
-  position: absolute;
-  background-color: var(--secondary-clr);
-  border: 2px solid var(--primary-clr);
-  border-top:none;
-  border-radius: 0 0 10px 10px;
-  min-width: 160px;
-  padding: 1em;
-  transform: translateX(calc(-1em - 2px));
-  z-index: 1;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.dropdown:hover {
-    border-bottom: none;
-}
-
-.search {
-    padding: 0.5em;
-    border: 2px solid var(--primary-clr);
-    font-size: 1.5rem;
-}
-
-.search-box {
-    border-radius: 5px 0 0 5px;
-    border-right: none;
-}
-
-.search-button {
-    color: #eee;
-    background-color: var(--primary-clr);
-    border-radius: 0 5px 5px 0;
-}
-
 details > summary:hover {
   cursor: pointer;
 }
@@ -190,11 +142,6 @@ details > summary:hover {
 
 #about .img-responsive {
   border-radius: 50%;
-  margin-left: auto;
-}
-
-.min-column {
-  align-items: center;
 }
 
 svg {

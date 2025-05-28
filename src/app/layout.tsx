@@ -23,7 +23,7 @@ export default function RootLayout({
             <Link href="https://asianetwork.org"><Image className="header-img" src="/logo.png" alt="ASIANetwork logo" /></Link>
             <Link className="nav-item home-link" href="/"><b>Home</b></Link>
             <Link className="nav-item" href="/resources/about">About</Link>
-            <p>Contact Us</p>
+            <Link className="nav-item" href="/resources/contact-us">Contact Us</Link>
           </nav>
         </header>
         <main>
