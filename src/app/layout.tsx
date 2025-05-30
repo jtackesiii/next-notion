@@ -27,7 +27,9 @@ export default function RootLayout({
           </nav>
         </header>
         <main>
+          <div className="wrapper">
             {children}
+          </div>
           </main>
         <footer>
           <div className="flex">

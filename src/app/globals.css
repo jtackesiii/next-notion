@@ -4,16 +4,16 @@
   --primary-font-weight: 400;
   --normal-font-size: 1.15rem;
   --table-border-clr: #ccc;
-  --blue: rgb(0, 0, 255, 0.5);
-  --brown: rgba(165, 42, 42, 0.5);
-  --default: rgba(86, 207, 237, 0.5);
+  --blue: rgb(0, 0, 255, 0.75);
+  --brown: rgba(165, 42, 42, 0.75);
+  --default: rgba(86, 207, 237, 0.75);
   --gray: rgba(128, 128, 128, 0.5);
-  --green: rgba(0, 128, 0, 0.5);
-  --orange: rgba(255, 166, 0, 0.5);
-  --pink: rgba(255, 192, 203, 0.5);
+  --green: rgba(0, 128, 0, 0.75);
+  --orange: rgba(255, 166, 0, 0.75);
+  --pink: rgb(237, 68, 96, 0.5);
   --purple: rgba(128, 0, 128, 0.5);
   --red: rgba(255, 0, 0, 0.5);
-  --yellow: rgba(255, 255, 0, 0.5);
+  --yellow: rgb(222, 200, 0);
 }
 
 html,
@@ -47,6 +47,10 @@ header, footer {
   text-align: center;
 }
 
+.italic {
+  font-style: italic;
+}
+
 .flex {
     display: flex;
     align-items: center;
@@ -68,7 +72,7 @@ header, footer {
 
 /* main */
 
-main {
+.wrapper {
     max-width: max-content;
     margin-inline: auto;
     padding-block: 2rem;
@@ -148,21 +152,27 @@ svg {
   cursor: pointer;
 }
 
-.table {
-  border: 1px solid var(--table-border-clr);
-}
-
 .td {
   padding: 1ch;
 }
 
 .tr {
   display: flex;
-  width: fit-content;
+  border-bottom: 1px solid var(--table-border-clr);
 }
 
-.th, .td {
-  box-shadow: inset 0 0 0 1px var(--table-border-clr);
+.hover-child {
+  height: 0;
+  overflow-y: clip;
+  border-bottom: none;
+  transition: height 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.3s;
+  interpolate-size: allow-keywords;
+}
+
+.hover-parent:hover + .hover-child {
+  height: auto;
+  opacity: 1;
+  border-bottom: 1px solid var(--table-border-clr);
 }
 
 .th {
@@ -236,58 +246,62 @@ svg {
 }
 
 .cell > p[data-color=blue] {
-  background-color: var(--blue);
+  color: var(--blue);
 }
 
 .cell > p[data-color=brown] {
-  background-color: var(--brown);
+  color: var(--brown);
 }
 
 .cell > p[data-color=default] {
-  background-color: var(--default);
+  color: var(--default);
 }
 
 .cell > p[data-color=gray] {
-  background-color: var(--gray);
+  color: var(--gray);
 }
 
 .cell > p[data-color=green] {
-  background-color: var(--green);
+  color: var(--green);
 }
 
 .cell > p[data-color=orange] {
-  background-color: var(--orange);
+  color: var(--orange);
 }
 
 .cell > p[data-color=red] {
-  background-color: var(--red);
+  color: var(--red);
 }
 
 .cell > p[data-color=pink] {
-  background-color: var(--pink);
+  color: var(--pink);
 }
 
 .cell > p[data-color=purple] {
-  background-color: var(--purple);
+  color: var(--purple);
 }
 
 .cell > p[data-color=yellow] {
-  background-color: var(--yellow);
+  color: var(--yellow);
 }
 
-@media screen and (max-width: 1024px) {
-  .th:not(:nth-child(-n+3)),
-  .td:not(:nth-child(-n+3)) {
+@media screen and (max-width: 950px) {
+  .th:not(:nth-child(-n+2)),
+  .td:not(:nth-child(-n+2)) {
     display: none !important;
   }
-  .th:nth-child(-n+3),
-  .td:nth-child(-n+3) {
-    min-width: 120px;
+  .table,
+  .tr {
+    width: 100% !important;
+  }
+  .th:first-child,
+  .td:first-child {
+    flex-grow: 1;
   }
 }
 
 /* At <=768px: Show only the first column (Title) */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 750px) {
   .th:not(:first-child),
   .td:not(:first-child) {
     display: none !important;
@@ -295,7 +309,6 @@ svg {
   .th:first-child,
   .td:first-child {
     width: 100% !important;
-    min-width: 100% !important;
     display: flex;
   }
   .table,

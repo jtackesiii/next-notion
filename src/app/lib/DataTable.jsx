@@ -13,13 +13,13 @@ import {
     getPaginationRowModel,
     useReactTable
     } from "@tanstack/react-table";
-import { useState, useMemo, useId, useCallback } from "react";
+import { useState, useMemo, useCallback, Fragment } from "react";
 
 const columns = [
     {
         accessorKey: 'title',
         header: 'Name',
-        size: 250,
+        size: 300,
         cell: ({cell, row}) => <Link className="cell-link" href={row.original.url != null ? row.original.url : `/resources/${row.original.slug}`}>{cell.getValue()}</Link>
     },
     {
@@ -28,8 +28,8 @@ const columns = [
         meta: {
             filterVariant: 'select',
           },
-        size: 100,
-        cell: (props) => <div className="cell flex">{props.getValue().map((resource) => <p className="resourceType" key={resource.id} data-color={resource.color}>{resource.name}</p>)}</div>,
+        size: 200,
+        cell: (props) => <div className="cell flex italic">{props.getValue().map((resource) => <p className="resourceType" key={resource.id} data-color={resource.color}>{resource.name}</p>)}</div>,
     },
     {
         accessorKey: 'region',
@@ -64,7 +64,7 @@ const columns = [
         meta: {
             filterVariant: 'select',
           },
-        size: 250,
+        size: 300,
         cell: (props) => <p className="cell project">{props.getValue()}</p>,
     },
     {
@@ -78,12 +78,16 @@ const columns = [
         header: 'URL',
         size: 100,
         cell: (props) => <p>{props.getValue()}</p>,
+    },
+    {
+        accessorKey: 'description',
+        header: 'Description',
+        cell: (props) => <p>{props.getValue()}</p>,
     }
 
 ];
 
 export default function DataTable({data}){
-    const selectId = useId();
     const [columnFilters, setColumnFilters] = useState({})
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -133,10 +137,11 @@ export default function DataTable({data}){
 
     const filteredData = useMemo(() => {
         return data.filter(row => {
-            // First check title search
+            // First check search box
             if (searchQuery) {
                 const title = row.title?.toLowerCase() || "";
-                if (!title.includes(searchQuery.toLowerCase())) {
+                const description = row.description?.toLowerCase() || "";
+                if (!title.includes(searchQuery.toLowerCase()) && !description.includes(searchQuery.toLowerCase())) {
                     return false;
                 }
             }
@@ -175,7 +180,11 @@ export default function DataTable({data}){
             columnFilters,
             columnVisibility: {
                 slug: false,
-                url: false
+                url: false,
+                discipline: false,
+                region: false,
+                audience: false,
+                description: false
             }
         },
         getCoreRowModel: getCoreRowModel(),
@@ -190,20 +199,20 @@ export default function DataTable({data}){
     });
 
     return (
-    <Box>
-        <Stack direction={{ base: "column", md: "row" }} spacing={4} mb={4} className="filter-bar">
-            <InputGroup startElement={<LuSearch />}>
+    <Box className="data-table">
+        <Stack direction={{ base: "column", md: "row" }} mb={4} className="filter-bar">
+            <InputGroup w="auto" startElement={<LuSearch />}>
                 <Input
-                    placeholder="Search by title..."
+                    placeholder="Search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     variant="outline"
                 />
             </InputGroup>
-            <Box flexGrow={1}>
+            <Box maxW="100%" flexGrow={1}>
                 <Select
                     instanceId="grouped-select"
-                    placeholder="Filters"
+                    placeholder="Keywords"
                     isClearable
                     isMulti
                     options={groupedOptions}
@@ -215,13 +224,6 @@ export default function DataTable({data}){
                         }))
                     )}
                     onChange={handleFilterChange}
-                    chakraStyles={{
-                        container: (provided) => ({
-                            ...provided,
-                            minW: "300px",
-                            maxW: "600px"
-                        })
-                    }}
                 />
             </Box>
         </Stack>
@@ -247,16 +249,24 @@ export default function DataTable({data}){
                 )}
             </Box>)}
             {
-                table.getRowModel().rows.map(row => <Box className="tr" key={row.id}>
-                    {row.getVisibleCells().map(cell => <Box className="td" w={cell.column.getSize()} key={cell.id}>
-                        {
-                            flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                            )
-                        }
-                    </Box>)}
-                </Box>)
+                table.getRowModel().rows.map(row =>
+                    <Fragment key={row.id}>
+                        <Box className="tr hover-parent">
+                            {row.getVisibleCells().map(cell => <Box className="td" w={cell.column.getSize()} key={cell.id}>
+                                {
+                                    flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext(),
+                                    )
+                                }
+                            </Box>)}
+                        </Box>
+                        <Box className="tr hover-child" key={row.id + "-sub"}>
+                            <Box className="td" w="100%">
+                                {row.original.description}
+                            </Box>
+                        </Box>
+                    </Fragment>)
             }
         </Box>
         <br />
@@ -266,11 +276,11 @@ export default function DataTable({data}){
         <ButtonGroup size="sm" attached variant="outline">
             <Button
                 onClick={() => table.previousPage()}
-                isDisabled={!table.getCanPreviousPage()}
+                disabled={!table.getCanPreviousPage()}
             >{"<"}</Button>
             <Button
                 onClick={() => table.nextPage()}
-                isDisabled={!table.getCanNextPage()}
+                disabled={!table.getCanNextPage()}
             >{">"}</Button>
         </ButtonGroup>
     </Box>);
