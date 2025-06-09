@@ -26,9 +26,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
-    useCache: true,
-  }
+    optimizePackageImports: ["@chakra-ui/react"]  }
 };
 
 export default nextConfig;
