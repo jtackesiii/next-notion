@@ -113,13 +113,40 @@ export function renderBlock(block) {
           {block.children.map((child) => renderBlock(child))}
         </div>
       );
+    // case 'image': {
+    //   const src = value.type === 'external' ? value.external.url : value.file.url;
+    //   const caption = value.caption ? value.caption[0]?.plain_text : '';
+    //   return (
+    //     <figure key={id}>
+    //       <Image src={src} alt={caption} className="img-responsive" />
+    //       {caption && <figcaption>{caption}</figcaption>}
+    //     </figure>
+    //   );
+    // }
     case 'image': {
-      const src = value.type === 'external' ? value.external.url : value.file.url;
+      // Use the proxy API route for Notion images
+      let src = value.type === 'external' ? value.external.url : value.file.url;
       const caption = value.caption ? value.caption[0]?.plain_text : '';
+      // Proxy Notion-hosted images through your API
+      if (
+        src.startsWith("https://www.notion-static.com/") ||
+        src.startsWith("https://s3.us-west-2.amazonaws.com/secure.notion-static.com/")
+      ) {
+        src = `/api/notion-image?src=${encodeURIComponent(src)}`;
+      }
       return (
         <figure key={id}>
           <Image src={src} alt={caption} className="img-responsive" />
           {caption && <figcaption>{caption}</figcaption>}
+        </figure>
+      );
+    }
+    case 'link_preview': {
+      const src = value.url;
+      console.log(src);
+      return (
+        <figure key={id}>
+          <Image src={src} alt='' className="img-responsive" />
         </figure>
       );
     }
