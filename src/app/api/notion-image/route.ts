@@ -8,23 +8,32 @@ export async function GET(req: NextRequest) {
   }
 
   // Only allow Notion-hosted images for security
-  if (!/^https:\/\/(www\.)?notion-static\.com\//.test(src) && !/^https:\/\/s3\.us-west-2\.amazonaws\.com\/secure\.notion-static\.com\//.test(src)) {
+  if (
+    !/^https:\/\/(www\.)?notion-static\.com\//.test(src) &&
+    !/^https:\/\/s3\.us-west-2\.amazonaws\.com\/secure\.notion-static\.com\//.test(src)
+  ) {
     return new NextResponse("Invalid image source", { status: 403 });
   }
 
-  // Fetch the image from Notion
-  const notionRes = await fetch(src);
+  // Forward User-Agent and (optionally) Referer headers
+  const headers: HeadersInit = {
+    "User-Agent": req.headers.get("user-agent") || "Mozilla/5.0",
+    // "Referer": req.headers.get("referer") || "", // Uncomment if needed
+  };
+
+  // Fetch the image from Notion with headers
+  const notionRes = await fetch(src, { headers });
+
   if (!notionRes.ok) {
     return new NextResponse("Failed to fetch image", { status: 502 });
   }
 
   // Set cache headers for CDN (1 day)
-  const headers = new Headers(notionRes.headers);
-  headers.set("Cache-Control", "public, max-age=86400, immutable");
+  const responseHeaders = new Headers(notionRes.headers);
+  responseHeaders.set("Cache-Control", "public, max-age=86400, immutable");
 
-  // Return the proxied image
   return new NextResponse(notionRes.body, {
     status: notionRes.status,
-    headers,
+    headers: responseHeaders,
   });
 }
