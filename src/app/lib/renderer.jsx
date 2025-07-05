@@ -124,16 +124,9 @@ export function renderBlock(block) {
     //   );
     // }
     case 'image': {
-      // Use the proxy API route for Notion images
-      let src = value.type === 'external' ? value.external.url : value.file.url;
+      // Always use the proxy API route with blockId for Notion images
       const caption = value.caption ? value.caption[0]?.plain_text : '';
-      // Proxy Notion-hosted images through your API
-      if (
-        src.startsWith("https://www.notion-static.com/") ||
-        src.startsWith("https://s3.us-west-2.amazonaws.com/secure.notion-static.com/")
-      ) {
-        src = `/api/notion-image?src=${encodeURIComponent(src)}`;
-      }
+      const src = `/api/notion-image?blockId=${encodeURIComponent(id)}`;
       return (
         <figure key={id}>
           <Image src={src} alt={caption} className="img-responsive" />

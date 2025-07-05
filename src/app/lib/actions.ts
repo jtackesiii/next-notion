@@ -4,7 +4,7 @@ import { Client, isFullBlock, isFullPageOrDatabase } from "@notionhq/client";
 import { randomUUID } from "crypto";
 import { PostType, Properties } from "@/types/types.notion";
 
-const notion = new Client({
+export const notion = new Client({
     auth: process.env.NOTION_SECRET,
 });
 
