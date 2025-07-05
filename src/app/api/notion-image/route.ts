@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { notion } from "@/app/lib/actions"; // Import your Notion client
+import { notion } from "@/app/lib/notion"; // Import your Notion client
 
 async function getNotionImageUrl(blockId: string): Promise<string | null> {
   try {

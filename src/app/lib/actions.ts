@@ -1,12 +1,9 @@
 "use server";
 
-import { Client, isFullBlock, isFullPageOrDatabase } from "@notionhq/client";
+import { isFullBlock, isFullPageOrDatabase } from "@notionhq/client";
 import { randomUUID } from "crypto";
 import { PostType, Properties } from "@/types/types.notion";
-
-export const notion = new Client({
-    auth: process.env.NOTION_SECRET,
-});
+import { notion } from "@/app/lib/notion"
 
 const databaseId = process.env.NOTION_PRODUCTION_DB;
 
