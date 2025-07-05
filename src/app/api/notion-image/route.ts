@@ -1,10 +1,19 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { notion } from "@/app/lib/notion"; // Import your Notion client
+import { notion } from "@/app/lib/notion";
+
+function formatBlockId(id: string) {
+  if (id.includes("-")) return id;
+  return id.replace(
+    /^(.{8})(.{4})(.{4})(.{4})(.{12})$/,
+    "$1-$2-$3-$4-$5"
+  );
+}
 
 async function getNotionImageUrl(blockId: string): Promise<string | null> {
   try {
-    const block = await notion.blocks.retrieve({ block_id: blockId });
+    const formattedId = formatBlockId(blockId);
+    const block = await notion.blocks.retrieve({ block_id: formattedId });
     if ("type" in block && block.type === "image" && "image" in block) {
       const imageBlock = block as {
         type: "image";
@@ -47,6 +56,7 @@ export async function GET(req: NextRequest) {
 
   const headers: HeadersInit = {
     "User-Agent": req.headers.get("user-agent") || "Mozilla/5.0",
+    "Referer": "https://www.notion.so/",
   };
   const notionRes = await fetch(src, { headers });
 
