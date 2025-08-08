@@ -127,6 +127,7 @@ export function renderBlock(block) {
       // Always use the proxy API route with blockId for Notion images
       const caption = value.caption ? value.caption[0]?.plain_text : '';
       const src = `/api/notion-image?blockId=${encodeURIComponent(id)}`;
+      console.log(id);
       return (
         <figure key={id}>
           <Image src={src} alt={caption} className="img-responsive" />

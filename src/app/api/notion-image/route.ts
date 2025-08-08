@@ -13,7 +13,9 @@ function formatBlockId(id: string) {
 async function getNotionImageUrl(blockId: string): Promise<string | null> {
   try {
     const formattedId = formatBlockId(blockId);
+    console.log("Fetching Notion block:", formattedId);
     const block = await notion.blocks.retrieve({ block_id: formattedId });
+    console.log("Notion block response:", JSON.stringify(block, null, 2));
     if ("type" in block && block.type === "image" && "image" in block) {
       const imageBlock = block as {
         type: "image";
@@ -31,16 +33,25 @@ async function getNotionImageUrl(blockId: string): Promise<string | null> {
       }
     }
     return null;
-  } catch {
+  } catch (err) {
+    console.error("Error retrieving Notion block:", err);
     return null;
   }
-}
 
 export async function GET(req: NextRequest) {
   const blockId = req.nextUrl.searchParams.get("blockId");
   if (!blockId) {
     return new NextResponse("Missing blockId", { status: 400 });
   }
+
+    // Development bypass: allow direct image URL for testing
+  if (process.env.NODE_ENV === "development") {
+    const directUrl = req.nextUrl.searchParams.get("directUrl");
+    if (directUrl) {
+      return NextResponse.redirect(directUrl);
+    }
+  }
+
 
   const src = await getNotionImageUrl(blockId);
   if (!src) {
