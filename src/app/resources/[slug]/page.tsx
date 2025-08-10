@@ -11,6 +11,8 @@ export async function generateStaticParams() {
   }))
 }
 
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function PostPage ({
     params,
 }: {
@@ -19,6 +21,7 @@ export default async function PostPage ({
     const { slug } = await params;
     const post = await getPageBySlug(slug);
     const blockId = post![0].id;
+    // Ensure blocks have their IDs
     const blocks = await getBlocks(blockId);
 
     return (<div className="main" id={slug}>

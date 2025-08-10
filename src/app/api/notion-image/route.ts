@@ -38,12 +38,22 @@ async function getNotionImageUrl(blockId: string): Promise<string | null> {
 
 export async function GET(req: NextRequest) {
   const blockId = req.nextUrl.searchParams.get("blockId");
+
+  // Add debug logging
+  console.log(`Fetching image for block ID: ${blockId}`);
+
   if (!blockId) {
+    console.error("Missing blockId in request");
     return new NextResponse("Missing blockId", { status: 400 });
   }
 
   const src = await getNotionImageUrl(blockId);
+
+  // Log the resolved URL
+  console.log(`Resolved URL for block ${blockId}: ${src}`);
+
   if (!src) {
+    console.error(`Failed to resolve image URL for block ${blockId}`);
     return new NextResponse("Could not resolve image URL", { status: 404 });
   }
 
@@ -59,7 +69,7 @@ export async function GET(req: NextRequest) {
   }
 
   const responseHeaders = new Headers(notionRes.headers);
-  responseHeaders.set("Cache-Control", "public, max-age=86400, immutable");
+  responseHeaders.set("Cache-Control", "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400");
   responseHeaders.set("Access-Control-Allow-Origin", "*");
 
   return new NextResponse(notionRes.body, {

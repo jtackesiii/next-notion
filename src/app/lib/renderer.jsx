@@ -1,9 +1,10 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
 import Text from './text';
+import Image from 'next/image';
 import styles from '@/app/post.module.css';
 import { randomUUID } from 'crypto';
-import { Heading, Image, AspectRatio, List, Stack } from '@chakra-ui/react';
+import { Heading, AspectRatio, List, Stack } from '@chakra-ui/react';
 
 export function renderBlock(block) {
   const { type, id } = block;
@@ -125,13 +126,14 @@ export function renderBlock(block) {
     // }
     case 'image': {
       const caption = value.caption ? value.caption[0]?.plain_text : '';
-      const src = `/api/notion-image?blockId=${id}`;
-      
+      // Ensure we use the block's unique ID for the image proxy
+      const imageUrl = `/api/notion-image?blockId=${id}`;
+
       return (
         <figure key={id}>
-          <Image 
-            src={src} 
-            alt={caption} 
+          <Image
+            src={imageUrl}
+            alt={caption || 'Notion image'}
             width={800}
             height={600}
             className="img-responsive"

@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "next build"
   publish = ".next"
 
 [[plugins]]
@@ -8,3 +8,8 @@
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "true"
   NODE_VERSION = "18"
+
+[[headers]]
+  for = "/api/notion-image/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
