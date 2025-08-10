@@ -4,18 +4,14 @@ import { notion } from "@/app/lib/notion";
 
 function formatBlockId(id: string) {
   if (id.includes("-")) return id;
-  return id.replace(
-    /^(.{8})(.{4})(.{4})(.{4})(.{12})$/,
-    "$1-$2-$3-$4-$5"
-  );
+  return id.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5");
 }
 
 async function getNotionImageUrl(blockId: string): Promise<string | null> {
   try {
     const formattedId = formatBlockId(blockId);
-    console.log("Fetching Notion block:", formattedId);
     const block = await notion.blocks.retrieve({ block_id: formattedId });
-    console.log("Notion block response:", JSON.stringify(block, null, 2));
+
     if ("type" in block && block.type === "image" && "image" in block) {
       const imageBlock = block as {
         type: "image";
@@ -25,6 +21,7 @@ async function getNotionImageUrl(blockId: string): Promise<string | null> {
           file?: { url: string };
         };
       };
+
       if (imageBlock.image.type === "external" && imageBlock.image.external) {
         return imageBlock.image.external.url;
       }
@@ -37,6 +34,7 @@ async function getNotionImageUrl(blockId: string): Promise<string | null> {
     console.error("Error retrieving Notion block:", err);
     return null;
   }
+}
 
 export async function GET(req: NextRequest) {
   const blockId = req.nextUrl.searchParams.get("blockId");
@@ -44,39 +42,25 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Missing blockId", { status: 400 });
   }
 
-    // Development bypass: allow direct image URL for testing
-  if (process.env.NODE_ENV === "development") {
-    const directUrl = req.nextUrl.searchParams.get("directUrl");
-    if (directUrl) {
-      return NextResponse.redirect(directUrl);
-    }
-  }
-
-
   const src = await getNotionImageUrl(blockId);
   if (!src) {
     return new NextResponse("Could not resolve image URL", { status: 404 });
   }
 
-  if (
-    !/^https:\/\/(www\.)?notion-static\.com\//.test(src) &&
-    !/^https:\/\/s3\.us-west-2\.amazonaws\.com\/secure\.notion-static\.com\//.test(src)
-  ) {
-    return new NextResponse("Invalid image source", { status: 403 });
-  }
-
   const headers: HeadersInit = {
-    "User-Agent": req.headers.get("user-agent") || "Mozilla/5.0",
-    "Referer": "https://www.notion.so/",
+    "User-Agent": "Mozilla/5.0",
+    "Referer": "https://www.notion.so",
+    "Origin": "https://www.notion.so",
   };
-  const notionRes = await fetch(src, { headers });
 
+  const notionRes = await fetch(src, { headers });
   if (!notionRes.ok) {
     return new NextResponse("Failed to fetch image", { status: 502 });
   }
 
   const responseHeaders = new Headers(notionRes.headers);
   responseHeaders.set("Cache-Control", "public, max-age=86400, immutable");
+  responseHeaders.set("Access-Control-Allow-Origin", "*");
 
   return new NextResponse(notionRes.body, {
     status: notionRes.status,
