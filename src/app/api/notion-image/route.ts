@@ -35,18 +35,12 @@ async function getNotionImageUrl(blockId: string): Promise<string | null> {
 export async function GET(req: NextRequest) {
   const blockId = req.nextUrl.searchParams.get("blockId");
 
-  // Add debug logging
-  console.log(`Fetching image for block ID: ${blockId}`);
-
   if (!blockId) {
     console.error("Missing blockId in request");
     return new NextResponse("Missing blockId", { status: 400 });
   }
 
   const src = await getNotionImageUrl(blockId);
-
-  // Log the resolved URL
-  console.log(`Resolved URL for block ${blockId}: ${src}`);
 
   if (!src) {
     console.error(`Failed to resolve image URL for block ${blockId}`);
@@ -57,6 +51,8 @@ export async function GET(req: NextRequest) {
     "User-Agent": "Mozilla/5.0",
     "Referer": "https://www.notion.so",
     "Origin": "https://www.notion.so",
+    "Vary": "Accept, Accept-Encoding, X-Notion-Block-ID",
+    "X-Notion-Block-ID": blockId
   };
 
   const notionRes = await fetch(src, { headers });
@@ -65,8 +61,10 @@ export async function GET(req: NextRequest) {
   }
 
   const responseHeaders = new Headers(notionRes.headers);
-  responseHeaders.set("Cache-Control", "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400");
+  responseHeaders.set("Cache-Control", "private, no-cache, must-revalidate");
   responseHeaders.set("Access-Control-Allow-Origin", "*");
+  responseHeaders.set("Vary", "Accept, Accept-Encoding, X-Notion-Block-ID");
+  responseHeaders.set("X-Notion-Block-ID", blockId);
 
   return new NextResponse(notionRes.body, {
     status: notionRes.status,
