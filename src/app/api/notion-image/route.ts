@@ -10,7 +10,10 @@ function formatBlockId(id: string) {
 async function getNotionImageUrl(blockId: string): Promise<string | null> {
   try {
     const formattedId = formatBlockId(blockId);
+    console.log('Fetching Notion block with ID:', formattedId);
+    
     const block = await notion.blocks.retrieve({ block_id: formattedId });
+    console.log('Retrieved block type:', block.type);
 
     if ("type" in block && block.type === "image" && "image" in block) {
       const imageBlock = block as {

@@ -122,20 +122,38 @@ export const getPageBySlug = async (slug: string): Promise<PostType[] | null> =>
 }
 
 export const getBlocks = async (id: string) => {
+  const databaseId = process.env.NOTION_PRODUCTION_DB;
 
-    const databaseId = process.env.NOTION_PRODUCTION_DB;
+  if(!databaseId || !id) {
+    console.log('Invalid Database or Page ID');
+    return null;
+  }
 
-    if(!databaseId || !id) return console.log('Invalid Database or Page ID');
+  const blockId = id.replaceAll('-', '');
 
-    const blockId = id.replaceAll('-', '');
+  // Add debug logging
+  console.log('Fetching blocks for ID:', blockId);
 
   const { results } = await notion.blocks.children.list({
     block_id: blockId,
     page_size: 100,
   });
+
   const isAllBlocks = results.every(isFullBlock);
-  if (!results || !isAllBlocks)
+  if (!results || !isAllBlocks) {
+    console.log('No valid blocks found');
     return null;
+  }
+
+  // Log image blocks for debugging
+  results.forEach(block => {
+    if (block.type === 'image') {
+      console.log('Found image block:', {
+        id: block.id,
+        type: block.type
+      });
+    }
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const childBlocks: any = results.map(async (block) => {

@@ -125,8 +125,10 @@ export function renderBlock(block) {
     //   );
     // }
     case 'image': {
+      // Add debug logging to verify block IDs
+      console.log('Rendering image block:', { blockId: id, type, value });
+      
       const caption = value.caption ? value.caption[0]?.plain_text : '';
-      // Ensure we use the block's unique ID for the image proxy
       const imageUrl = `/api/notion-image?blockId=${id}`;
 
       return (
@@ -137,6 +139,7 @@ export function renderBlock(block) {
             width={800}
             height={600}
             className="img-responsive"
+            priority={false}
           />
           {caption && <figcaption>{caption}</figcaption>}
         </figure>
