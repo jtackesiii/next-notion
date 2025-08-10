@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { notion } from "@/app/lib/notion";
+import { BlockObjectResponse, ImageBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 function formatBlockId(id: string) {
   if (id.includes("-")) return id;
@@ -11,24 +12,16 @@ async function getNotionImageUrl(blockId: string): Promise<string | null> {
   try {
     const formattedId = formatBlockId(blockId);
     console.log('Fetching Notion block with ID:', formattedId);
-    
-    const block = await notion.blocks.retrieve({ block_id: formattedId });
+
+    const block = await notion.blocks.retrieve({ block_id: formattedId }) as BlockObjectResponse;
     console.log('Retrieved block type:', block.type);
 
-    if ("type" in block && block.type === "image" && "image" in block) {
-      const imageBlock = block as {
-        type: "image";
-        image: {
-          type: "external" | "file";
-          external?: { url: string };
-          file?: { url: string };
-        };
-      };
-
-      if (imageBlock.image.type === "external" && imageBlock.image.external) {
+    if (block.type === "image") {
+      const imageBlock = block as ImageBlockObjectResponse;
+      if (imageBlock.image.type === "external") {
         return imageBlock.image.external.url;
       }
-      if (imageBlock.image.type === "file" && imageBlock.image.file) {
+      if (imageBlock.image.type === "file") {
         return imageBlock.image.file.url;
       }
     }
