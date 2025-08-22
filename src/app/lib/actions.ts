@@ -7,17 +7,59 @@ import { notion } from "@/app/lib/notion"
 
 const databaseId = process.env.NOTION_PRODUCTION_DB;
 
+export const getHome = async () => {
+  try {
+    const homePage = await notion.databases.query ({
+      database_id: process.env.NOTION_PRODUCTION_DB!,
+      filter: {
+        and: [
+          {
+            property: "Status",
+            status: {
+              equals: "live",
+            }
+          },
+          {
+            property: "Name",
+            title: {
+              equals: "Home",
+            }
+          }
+        ]
+      }
+    });
+    if (!homePage || !homePage.results.length) {
+      console.error("No home page found");
+      return null;
+    }
+    const blocks = await getBlocks(homePage.results[0].id);
+    return blocks;
+  } catch (error) {
+    console.error("Error fetching home blocks:", error);
+    return null;
+  }
+};
+
 export const getProduction = async (): Promise<PostType[] | null> => {
     if(!databaseId) return null;
 
     const response = await notion.databases.query({
         database_id: databaseId!,
         filter: {
-            property: "Status",
-            status: {
+          and: [
+            {
+              property: "Status",
+              status: {
                 equals: "live",
+              }
+           },
+           {
+             property: "Resource",
+              multi_select: {
+                does_not_contain: "Navigation",
             }
-        },
+           }
+        ]},
         sorts: [
         {
             property: 'Updated',
@@ -52,34 +94,88 @@ export const getProduction = async (): Promise<PostType[] | null> => {
     return posts;
 }
 
-export const getPageById = async (id: string): Promise<PostType | null> => {
+export const getNavigation = async (): Promise<PostType[] | null> => {
+    if(!databaseId) return null;
 
-    if(!databaseId || !id) return null;
-
-    const response = await notion.pages.retrieve({
-        page_id: id,
+    const response = await notion.databases.query({
+        database_id: databaseId!,
+        filter: {
+          and: [
+            {
+              property: "Status",
+              status: {
+                equals: "live",
+              }
+           },
+           {
+             property: "Resource",
+              multi_select: {
+                contains: "Navigation",
+            }
+           }
+        ]},
+        sorts: [
+        {
+            property: 'Contributor',
+            direction: 'ascending',
+        },
+        ],
     });
 
-    if (!response || !isFullPageOrDatabase(response)) return null;
+    if (!response || !response?.results.length) return null;
 
-    const properties = response.properties as unknown as Properties;
-    const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
-    return {
-        id: response.id,
-        title: properties.Name.title[0].plain_text,
-        contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ' '),
-        updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
-        description: properties.Description.rich_text[0].plain_text,
-        resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
-        country: properties.Country?.multi_select?.map((Country) => Country.name + ' '),
-        region: properties.Region?.formula?.string,
-        discipline: properties.Discipline?.multi_select?.map((Discipline) => Discipline.name + ' '),
-        project: properties.Project?.select?.name,
-        audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
-        slug: properties.Slug.formula.string,
-        url: properties.URL?.url
-    }
+    const posts: PostType[] = response.results
+      .filter(isFullPageOrDatabase)
+      .map((result) => {
+        const properties = result.properties as unknown as Properties;
+        const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
+        return {
+          id: result.id,
+          title: properties.Name.title[0].plain_text,
+          contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ''),
+          updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
+          description: properties.Description.rich_text[0].plain_text,
+          resourceType: properties.Resource.multi_select,
+          country: properties.Country?.multi_select?.map((Country) => Country.name + ''),
+          region: properties.Region?.formula?.string,
+          discipline: properties.Discipline?.multi_select,
+          project: properties.Project?.select?.name,
+          audience: properties.Audience?.multi_select,
+          slug: properties.Slug.formula.string,
+          url: properties.URL.url
+        }
+    });
+    return posts;
 }
+
+// export const getPageById = async (id: string): Promise<PostType | null> => {
+
+//     if(!databaseId || !id) return null;
+
+//     const response = await notion.pages.retrieve({
+//         page_id: id,
+//     });
+
+//     if (!response || !isFullPageOrDatabase(response)) return null;
+
+//     const properties = response.properties as unknown as Properties;
+//     const options = {month: "long" as const, day: "numeric" as const, year: "numeric" as const};
+//     return {
+//         id: response.id,
+//         title: properties.Name.title[0].plain_text,
+//         contributor: properties.Contributor?.multi_select?.map((Contributor) => Contributor.name + ' '),
+//         updated: new Date(properties.Updated.last_edited_time).toLocaleDateString("en-US", options),
+//         description: properties.Description.rich_text[0].plain_text,
+//         resourceType: properties.Resource.multi_select.map((Resource) => Resource.name + ' '),
+//         country: properties.Country?.multi_select?.map((Country) => Country.name + ' '),
+//         region: properties.Region?.formula?.string,
+//         discipline: properties.Discipline?.multi_select?.map((Discipline) => Discipline.name + ' '),
+//         project: properties.Project?.select?.name,
+//         audience: properties.Audience.multi_select?.map((Audience) => Audience.name + ' '),
+//         slug: properties.Slug.formula.string,
+//         url: properties.URL?.url
+//     }
+// }
 
 export const getPageBySlug = async (slug: string): Promise<PostType[] | null> => {
     if(!databaseId) return null;
